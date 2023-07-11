@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <prussdrv.h>
+#include <pruss_intc_mapping.h>
+
+// Defining PWM period for servo motors (in ns)
+#define SERVO_PWM_PERIOD 20000000
+
+// Defining the servo motor positions for different notes
+#define C_NOTES {1450000, 1300000, 1200000, 1450000}
+#define G_NOTES {1300000, 1200000, 1100000, 1300000}
+#define A_NOTES {1200000, 1100000, 1000000, 1200000}
+#define E_NOTES {1100000, 1000000, 950000, 1100000}
+
+void play_note(int note_position) {
+    unsigned int* servo_ctl_reg;
+
+    // The melody is played on one string (one servo)
+    servo_ctl_reg = prussdrv_map_prumem(PRUSS0_SHARED_DATARAM, 4*0);
+    *servo_ctl_reg = note_position;
+
+    // Delay for 500 milliseconds (enough time for the servo motor to move and the string to ring)
+    usleep(500000);
+
+    *servo_ctl_reg = SERVO_PWM_PERIOD - note_position;
+
+    // Delay for 500 milliseconds (enough time for the string to stop ringing)
+    usleep(500000);
+}
+
+void play_melody(int notes[4]) {
+    for (int i = 0; i < 4; i++) {
+        play_note(notes[i]);
+    }
+}
+
+int main() {
+    prussdrv_init();
+    prussdrv_open(PRU_EVTOUT_0);
+
+    int c_notes[4] = C_NOTES;
+    int g_notes[4] = G_NOTES;
+    int a_notes[4] = A_NOTES;
+    int e_notes[4] = E_NOTES;
+
+    play_melody(c_notes);
+    play_melody(g_notes);
+    play_melody(a_notes);
+    play_melody(e_notes);
+
+    prussdrv_exit();
+
+    return 0;
+}
