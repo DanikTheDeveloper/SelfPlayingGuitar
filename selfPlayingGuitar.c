@@ -18,6 +18,23 @@
 
 #define STRUM_TIME 1000000 // 1 second
 
+//Frequencies 
+#define NOTE1_FREQ 500   // 500Hz
+#define NOTE2_FREQ 450   // 450Hz
+#define NOTE3_FREQ 400   // 400Hz
+#define NOTE4_FREQ 350   // 350Hz
+#define NOTE5_FREQ 300   // 300Hz
+#define NOTE6_FREQ 250   // 250Hz
+#define NOTE7_FREQ 200   // 200Hz
+
+#define NOTE1_TIME 2000 // 2ms
+#define NOTE2_TIME 1800 // 1.8ms
+#define NOTE3_TIME 1600 // 1.6ms
+#define NOTE4_TIME 1400 // 1.4ms
+#define NOTE5_TIME 1200 // 1.2ms
+#define NOTE6_TIME 1000 // 1ms
+#define NOTE7_TIME 800  // 0.8ms
+
 #define NOTE_COUNT 7
 
 struct note_gpio_mapping {
@@ -27,13 +44,13 @@ struct note_gpio_mapping {
 };
 
 note_gpio_mapping note_mappings[NOTE_COUNT] = {
-    {NOTE2_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-    {NOTE3_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-    {NOTE4_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-    {NOTE5_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-    {NOTE6_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-    {NOTE7_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-    {NOTE1_GPIO, NOTE1_FREQ, NOTE1_TIME},
+    {NOTE2_GPIO, NOTE2_FREQ, NOTE2_TIME},
+    {NOTE3_GPIO, NOTE3_FREQ, NOTE3_TIME},
+    {NOTE4_GPIO, NOTE4_FREQ, NOTE4_TIME},
+    {NOTE5_GPIO, NOTE5_FREQ, NOTE5_TIME},
+    {NOTE6_GPIO, NOTE6_FREQ, NOTE6_TIME},
+    {NOTE7_GPIO, NOTE7_FREQ, NOTE7_TIME},
+    {NOTE1_GPIO, NOTE1_FREQ, NOTE1_TIME}
 };
 
 void* playChord(void *vargp)
