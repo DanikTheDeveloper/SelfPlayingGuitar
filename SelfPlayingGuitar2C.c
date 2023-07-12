@@ -11,10 +11,10 @@
 #define NOTE6_GPIO 48
 #define NOTE7_GPIO 49
 
-#define NOTE1_FREQ 50   // 50Hz
-#define NOTE1_TIME 2000 // 2ms
-#define OTHER_NOTE_FREQ 50 // 50Hz
-#define OTHER_NOTE_TIME 1500 // 1.5ms
+#define NOTE1_ANGLE 90
+#define OTHER_NOTE_ANGLE0 0
+#define OTHER_NOTE_ANGLE45 45
+#define OTHER_NOTE_ANGLE60 60
 
 #define STRUM_TIME 1000000 // 1 second
 
@@ -23,28 +23,27 @@
 
 struct note_gpio_mapping {
     uint8_t gpio_pin;
-    uint32_t pwm_freq;
-    uint32_t pwm_duty;
+    uint32_t servo_angle;
 };
 
 note_gpio_mapping chord_mappings[CHORD_COUNT][NOTE_COUNT - 1] = {
     // Chord 1
     {
-        {NOTE2_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-        {NOTE3_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-        {NOTE4_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-        {NOTE5_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-        {NOTE6_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-        {NOTE7_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
+        {NOTE2_GPIO, OTHER_NOTE_ANGLE0},
+        {NOTE3_GPIO, OTHER_NOTE_ANGLE0},
+        {NOTE4_GPIO, OTHER_NOTE_ANGLE45},
+        {NOTE5_GPIO, OTHER_NOTE_ANGLE60},
+        {NOTE6_GPIO, OTHER_NOTE_ANGLE60},
+        {NOTE7_GPIO, OTHER_NOTE_ANGLE0},
     },
     // Chord 2
     {
-        {NOTE3_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-        {NOTE4_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-        {NOTE5_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-        {NOTE6_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-        {NOTE2_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
-        {NOTE7_GPIO, OTHER_NOTE_FREQ, OTHER_NOTE_TIME},
+        {NOTE3_GPIO, OTHER_NOTE_ANGLE0},
+        {NOTE4_GPIO, OTHER_NOTE_ANGLE0},
+        {NOTE5_GPIO, OTHER_NOTE_ANGLE45},
+        {NOTE6_GPIO, OTHER_NOTE_ANGLE60},
+        {NOTE2_GPIO, OTHER_NOTE_ANGLE60},
+        {NOTE7_GPIO, OTHER_NOTE_ANGLE0},
     }
 };
 
@@ -67,9 +66,9 @@ void* playChord(void *vargp)
 
         for (int i = 0; i < NOTE_COUNT - 1; i++)
         {
-            pruio_cap_config(io, chord_mappings[c][i].gpio_pin, chord_mappings[c][i].pwm_freq);
+            pruio_pwm_setangle(io, chord_mappings[c][i].gpio_pin, chord_mappings[c][i].servo_angle);
             if (io->Err) {
-                printf("failed setting CAP mode (%s)\n", io->Err);
+                printf("failed setting servo angle (%s)\n", io->Err);
                 pruio_destroy(io);
                 pthread_mutex_unlock(&pru_mutex);
                 return NULL;
@@ -78,7 +77,7 @@ void* playChord(void *vargp)
         pthread_cond_signal(&strum_done_cond);
         pthread_mutex_unlock(&pru_mutex);
 
-        usleep(STRUM_TIME); // sleep for strum time
+        usleep(STRUM_TIME);
         pruio_destroy(io);
     }
     return NULL;
@@ -99,16 +98,16 @@ void* playNote1(void *vargp)
             return NULL;
         }
 
-        pruio_cap_config(io, NOTE1_GPIO, NOTE1_FREQ);
+        pruio_pwm_setangle(io, NOTE1_GPIO, NOTE1_ANGLE);
         if (io->Err) {
-            printf("failed setting CAP mode (%s)\n", io->Err);
+            printf("failed setting servo angle (%s)\n", io->Err);
             pruio_destroy(io);
             pthread_mutex_unlock(&pru_mutex);
             return NULL;
         }
 
         pthread_mutex_unlock(&pru_mutex);
-        usleep(STRUM_TIME); // sleep for strum time
+        usleep(STRUM_TIME);
 
         pruio_destroy(io);
     }
